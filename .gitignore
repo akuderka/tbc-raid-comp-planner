@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+dist/
+.cache/
+*.log
+*.zip
+go1.25.4.windows-amd64.zip
+wowsims-tbc-new.zip

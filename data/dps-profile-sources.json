@@ -1,0 +1,7 @@
+{
+  "Druid:Balance": { "baselineDps": 1015, "source": "Morogrim WCL median less 50% calibrated received value", "samples": 2 },
+  "Shaman:Elemental": { "baselineDps": 1312, "source": "Morogrim WCL median less 50% calibrated received value", "samples": 4 },
+  "Paladin:Retribution": { "baselineDps": 993, "source": "Morogrim WCL median less 50% calibrated received value", "samples": 4 },
+  "Rogue:Combat": { "baselineDps": 894, "source": "Morogrim WCL median less 50% calibrated received value", "samples": 4 },
+  "Warlock:Affliction": { "baselineDps": 1224, "source": "Morogrim WCL median less 50% calibrated received value", "samples": 4 }
+}

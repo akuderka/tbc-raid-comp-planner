@@ -1,0 +1,1490 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #090e1a;
+  color: #e8eefc;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid #33415d;
+  background: #151d2d;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #60708e;
+}
+
+input,
+select {
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid #33415d;
+  border-radius: 10px;
+  background: #0d1422;
+  color: #e8eefc;
+  padding: 10px 12px;
+}
+
+.appShell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 24px;
+  border-right: 1px solid #222c40;
+  background: linear-gradient(180deg, #111827, #0b1020);
+}
+
+.brand h1,
+.hero h2 {
+  margin: 4px 0 0;
+}
+
+.brand h1 {
+  font-size: 26px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #f0b94d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.sideNav {
+  display: grid;
+  gap: 10px;
+  margin: 28px 0;
+}
+
+.sideNav button {
+  min-height: 82px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  background: #101827;
+}
+
+.sideNav button.active {
+  border-color: #f0b94d;
+  background: linear-gradient(145deg, #202635, #151c2a);
+  box-shadow: 0 0 0 1px rgba(240,185,77,.12);
+}
+
+.sideNav .legacyEntry span {
+  letter-spacing: .08em;
+}
+
+.sideNav span {
+  font-weight: 800;
+}
+
+.sideNav small,
+.selectedDate small,
+.selectedDate span,
+.sub,
+.metrics small,
+.metrics span,
+.plannerHeader p,
+.benchPanel p,
+.availabilityPanel p,
+.availabilityRow small,
+.raidDateCard small,
+.raidDateStats,
+.who span,
+.who small,
+.dps span,
+.benchChips small {
+  color: #8e9bad;
+}
+
+.selectedDate {
+  padding: 16px;
+  border: 1px solid #283142;
+  border-radius: 16px;
+  background: #0d1422;
+  display: grid;
+  gap: 4px;
+}
+
+.selectedDate strong {
+  font-size: 22px;
+}
+
+.workspace {
+  min-width: 0;
+  max-width: 1320px;
+  width: 100%;
+  padding: 28px;
+}
+
+.legacyNav {
+  min-height: 54px;
+  margin-bottom: 18px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid #3a3440;
+  border-radius: 14px;
+  background: #15131b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.legacyNav > span {
+  color: #a89cae;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.legacyNav > div {
+  display: flex;
+  gap: 6px;
+}
+
+.legacyNav button {
+  padding: 7px 10px;
+  color: #a89cae;
+  background: transparent;
+}
+
+.legacyNav button.active {
+  color: #fff;
+  border-color: #f0b94d;
+  background: #28222b;
+}
+
+.profileFoundation {
+  min-height: 480px;
+}
+
+.profileCalendar {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.profileWeekStrip {
+  min-width: 0;
+  padding-bottom: 4px;
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+}
+
+.profileWeekStrip button {
+  flex: 0 0 auto;
+  min-width: 112px;
+  padding: 8px 10px;
+  text-align: left;
+  background: #111722;
+}
+
+.profileWeekStrip button.active {
+  border-color: #f0b94d;
+  background: #28222b;
+}
+
+.profileWeekStrip span,
+.profileWeekStrip small {
+  display: block;
+}
+
+.profileWeekStrip span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.profileWeekStrip small {
+  margin-top: 3px;
+  color: #8e9bad;
+  font-size: 9px;
+}
+
+.addProfileRaid {
+  display: flex;
+  gap: 7px;
+  align-items: start;
+}
+
+.addProfileRaid input {
+  width: 142px;
+  margin: 0;
+  padding: 8px 9px;
+  font-size: 11px;
+}
+
+.addProfileRaid button {
+  white-space: nowrap;
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.profileAbsenceBar {
+  margin-bottom: 14px;
+  padding: 9px 12px;
+  border: 1px solid #3a3240;
+  border-radius: 12px;
+  background: #16131c;
+  display: grid;
+  grid-template-columns: minmax(190px, .7fr) minmax(180px, 240px) minmax(260px, 1.3fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.profileAbsenceBar span,
+.profileAbsenceBar strong {
+  display: block;
+}
+
+.profileAbsenceBar span {
+  color: #c79fa9;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.profileAbsenceBar strong {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.profileAbsenceBar select {
+  margin: 0;
+  padding: 7px 9px;
+  font-size: 10px;
+}
+
+.profileAbsenceChips {
+  min-width: 0;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.profileAbsenceChips button {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  border-color: #6d313d;
+  background: #211018;
+  font-size: 9px;
+}
+
+.profileAbsenceChips small {
+  color: #8e9bad;
+}
+
+.profileRotation {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #283142;
+  border-radius: 12px;
+  background: #111722;
+  display: grid;
+  grid-template-columns: minmax(210px, .8fr) minmax(420px, 1.7fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.rotationSummary span,
+.rotationSummary strong,
+.rotationSummary small {
+  display: block;
+}
+
+.rotationSummary span {
+  color: #f0b94d;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.rotationSummary strong {
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.rotationSummary small {
+  color: #8e9bad;
+  font-size: 9px;
+}
+
+.rotationSuggestions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rotationSuggestions > div {
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: #0d1422;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rotationSuggestions > div > span {
+  color: #8e9bad;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.rotationSuggestions strong {
+  min-width: 0;
+  font-size: 11px;
+}
+
+.rotationSuggestions strong small {
+  display: block;
+  color: #66758b;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.profileRotation > button {
+  padding: 7px 10px;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.profileRotation > button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.raidWideRiskPanel {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #3b3545;
+  border-radius: 12px;
+  background: #12141d;
+}
+
+.raidWideRiskHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.raidWideRiskHeader span,
+.raidWideRiskHeader strong {
+  display: block;
+}
+
+.raidWideRiskHeader span {
+  color: #f0b94d;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.raidWideRiskHeader strong {
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.raidWideRiskHeader small {
+  color: #8e9bad;
+  font-size: 9px;
+}
+
+.raidWideRiskColumns {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.raidWideRiskColumns article {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.raidWideRiskColumns h3 {
+  margin: 0 0 2px;
+  color: #aab5c8;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.raidWideRisk,
+.raidWideClear {
+  padding: 7px 9px;
+  border-left: 3px solid #ff6b6b;
+  border-radius: 7px;
+  background: #211018;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+}
+
+.raidWideRisk.risk {
+  border-left-color: #f0b94d;
+  background: #211d10;
+}
+
+.raidWideRisk.assignment {
+  border-left-color: #7ca8e8;
+  background: #101b2b;
+}
+
+.raidWideRisk strong {
+  font-size: 10px;
+}
+
+.raidWideRisk span {
+  color: #c9949b;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.raidWideRisk small {
+  grid-column: 1 / -1;
+  color: #9b7f85;
+  font-size: 8px;
+}
+
+.raidWideRisk.risk span,
+.raidWideRisk.risk small {
+  color: #b8a06a;
+}
+
+.raidWideRisk.assignment span,
+.raidWideRisk.assignment small {
+  color: #829fc8;
+}
+
+.raidWideClear {
+  color: #79bd82;
+  border-left-color: #65c56f;
+  background: #132719;
+  font-size: 9px;
+}
+
+.fairnessPool {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.selectedBenchPool,
+.eligibleBenchPool {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+}
+
+.eligibleBenchPool {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  overflow: visible;
+}
+
+.selectedBenchPool > span {
+  flex: 0 0 72px;
+  color: #8e9bad;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.benchPoolCategory {
+  min-width: 0;
+  padding: 5px 6px;
+  border-radius: 7px;
+  background: #0d1422;
+}
+
+.benchPoolCategory > span {
+  display: block;
+  margin-bottom: 4px;
+  color: #8e9bad;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.benchPoolCategory > div {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.benchPoolCategory > div > small {
+  color: #66758b;
+  font-size: 9px;
+}
+
+.selectedBenchPool button,
+.eligibleBenchPool button {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  font-size: 10px;
+}
+
+.selectedBenchPool button {
+  border-color: #f0b94d;
+  background: #28222b;
+}
+
+.eligibleBenchPool button {
+  --class: #566275;
+  border-left: 3px solid var(--class);
+  text-align: left;
+}
+
+.eligibleBenchPool button small {
+  display: block;
+  margin-top: 1px;
+  color: #748298;
+  font-size: 8px;
+}
+
+.profilePlannerHeader {
+  min-height: 48px;
+  margin-bottom: 14px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid #283142;
+  border-radius: 12px;
+  background: #111722;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profilePlannerHeader strong,
+.profilePlannerHeader span {
+  display: block;
+}
+
+.profilePlannerHeader span {
+  margin-top: 2px;
+  color: #8e9bad;
+  font-size: 12px;
+}
+
+.profilePlannerHeader button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.compactCompGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 18px 22px;
+}
+
+.compactParty h3 {
+  margin: 0 0 9px 2px;
+  color: #d9e1f0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.compactSlots {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #252d3d;
+  border-radius: 7px 7px 0 0;
+  background: #151b29;
+}
+
+.compactSlot {
+  --class: #566275;
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 43px minmax(0, 1fr);
+  gap: 7px;
+  cursor: grab;
+}
+
+.compactSlot:active {
+  cursor: grabbing;
+}
+
+.compactClassIcon,
+.compactSlot > div {
+  min-width: 0;
+  border-radius: 6px;
+  background: #101624;
+}
+
+.compactClassIcon {
+  display: grid;
+  place-items: center;
+  color: var(--class);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.compactSlot > div {
+  padding: 6px 10px;
+  display: grid;
+  align-content: center;
+}
+
+.compactSlot strong,
+.compactSlot small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compactSlot strong {
+  color: #edf2fb;
+  font-size: 13px;
+}
+
+.compactSlot small,
+.emptySlotLabel {
+  color: #8e9bad;
+  font-size: 10px;
+}
+
+.compactSlot.empty {
+  cursor: default;
+}
+
+.compactSlot.absent {
+  opacity: .68;
+  cursor: not-allowed;
+}
+
+.compactSlot.absent .compactClassIcon,
+.compactSlot.absent > div {
+  background: #211018;
+}
+
+.compactSlot.empty .compactClassIcon,
+.compactSlot.empty > div {
+  background: #111725;
+}
+
+.compactBuffs {
+  min-height: 38px;
+  padding: 9px 10px;
+  border: 1px solid #252d3d;
+  border-top: 0;
+  border-radius: 0 0 7px 7px;
+  background: #101624;
+  color: #b7c4da;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.compactBuffs.inactive {
+  color: #8e9bad;
+  font-size: 13px;
+}
+
+.missingGroupBuffs {
+  margin-top: 6px;
+  padding: 8px 9px;
+  border: 1px solid #63313c;
+  border-radius: 7px;
+  background: #211018;
+  display: grid;
+  gap: 6px;
+}
+
+.missingGroupBuffs > span {
+  color: #ff9098;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.missingGroupBuffs > div {
+  display: grid;
+  gap: 1px;
+}
+
+.missingGroupBuffs strong {
+  color: #ffd4d7;
+  font-size: 10px;
+}
+
+.missingGroupBuffs small {
+  color: #b48b92;
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.hero h2 {
+  font-size: 34px;
+}
+
+.sub {
+  max-width: 760px;
+  line-height: 1.55;
+}
+
+.status {
+  white-space: nowrap;
+  color: #e9c778;
+}
+
+.calendarLayout {
+  display: grid;
+  grid-template-columns: 320px minmax(300px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.card,
+.raidDateCard,
+.metrics article,
+.party,
+.benchPanel,
+.constraintBanner,
+.riskCard,
+.riskGrid article {
+  border: 1px solid #283142;
+  border-radius: 16px;
+  background: #111722;
+}
+
+.card {
+  padding: 18px;
+}
+
+.createRaid {
+  display: grid;
+  gap: 12px;
+}
+
+.createRaid h3,
+.availabilityPanel h3,
+.plannerHeader h3,
+.benchPanel h3 {
+  margin: 0;
+}
+
+.createRaid label {
+  color: #c7d2e5;
+  font-size: 13px;
+}
+
+.raidList {
+  display: grid;
+  gap: 12px;
+}
+
+.raidDateCard {
+  overflow: hidden;
+}
+
+.raidDateCard.selected {
+  border-color: #f0b94d;
+}
+
+.raidDateCard > button {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+}
+
+.raidDateCard strong {
+  font-size: 18px;
+}
+
+.raidDateStats {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 16px;
+  font-size: 12px;
+}
+
+.raidDateStats span {
+  border: 1px solid #303a51;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+
+.availabilityPanel {
+  grid-column: 1 / -1;
+}
+
+.availabilityPanel p {
+  margin-top: 4px;
+}
+
+.availabilityList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.availabilityRow {
+  --class: #888;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border-left: 3px solid var(--class);
+  border-radius: 10px;
+  background: #0d121b;
+}
+
+.availabilityRow small {
+  display: block;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+}
+
+.segmented button {
+  padding: 6px 8px;
+  color: #9ca9bd;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.segmented button.active {
+  color: #fff;
+  border-color: #f0b94d;
+  background: #2b2730;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metrics article {
+  padding: 16px;
+}
+
+.metrics strong {
+  display: block;
+  margin: 3px 0;
+  font-size: 28px;
+}
+
+.constraintBanner {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #171422;
+}
+
+.constraintBanner div {
+  display: flex;
+  gap: 10px;
+}
+
+.constraintBanner span {
+  color: #d2b0b0;
+}
+
+.riskGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.riskAssessmentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.riskGrid article {
+  padding: 16px;
+}
+
+.riskCard {
+  padding: 16px;
+}
+
+.riskGrid h3,
+.riskCard h3 {
+  margin: 4px 0 12px;
+}
+
+.riskRows,
+.backupRows,
+.statusBuckets,
+.benchTable {
+  display: grid;
+  gap: 8px;
+}
+
+.riskRow,
+.backupRows > div,
+.statusBuckets > div,
+.benchTable > div {
+  --class: #8e9bad;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--class);
+  border-radius: 10px;
+  background: #0d121b;
+  display: grid;
+  gap: 2px;
+}
+
+.riskRow {
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}
+
+.riskRow span,
+.backupRows span,
+.statusBuckets span,
+.benchTable span,
+.riskRow small,
+.backupRows small {
+  color: #8e9bad;
+  font-size: 12px;
+}
+
+.statusBuckets strong,
+.statusBuckets span,
+.benchTable strong,
+.benchTable span {
+  display: block;
+}
+
+.riskRow.low { --class: #65c56f; }
+.riskRow.medium { --class: #f0b94d; }
+.riskRow.high { --class: #ff6b6b; }
+
+.riskPrototypeHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+  gap: 14px;
+}
+
+.riskRaidSelector {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.riskRaidSelector label,
+.riskRaidSelector > div {
+  border: 1px solid #283142;
+  border-radius: 16px;
+  background: #111722;
+  padding: 14px 16px;
+}
+
+.riskRaidSelector span,
+.riskRaidSelector small,
+.prototypeRecordActions small {
+  display: block;
+  color: #8e9bad;
+}
+
+.riskRaidSelector strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.riskPrototypeHero article,
+.rotationBoard article {
+  border: 1px solid #283142;
+  border-radius: 16px;
+  background: #111722;
+  padding: 16px;
+}
+
+.riskPrototypeHero h3,
+.rotationBoard h3 {
+  margin: 4px 0 12px;
+}
+
+.suggestedBenchGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.suggestedBenchGrid > div {
+  min-height: 132px;
+  border: 1px solid #283142;
+  border-radius: 14px;
+  background: #0d121b;
+  padding: 12px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.suggestedBenchGrid span,
+.suggestedBenchGrid small {
+  color: #8e9bad;
+  font-size: 12px;
+}
+
+.suggestedBenchGrid strong {
+  font-size: 20px;
+}
+
+.prototypeStatusForm {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 130px auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.prototypeStatusChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.prototypeRecordActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.prototypeStatusChips > span {
+  color: #8e9bad;
+}
+
+.prototypeStatusChips button {
+  text-transform: capitalize;
+}
+
+.prototypeStatusChips .absent,
+.rotationRow.absent {
+  border-color: #6d313d;
+  background: #211018;
+}
+
+.prototypeStatusChips .tentative,
+.rotationRow.tentative {
+  border-color: #6d5b31;
+  background: #211d10;
+}
+
+.rotationBoard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.compositionRiskPanel {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #283142;
+  border-radius: 16px;
+  background: #111722;
+}
+
+.compositionRiskHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.compositionRiskHeader h3 {
+  margin: 4px 0;
+}
+
+.compositionRiskHeader p:last-child {
+  margin: 0;
+  color: #8e9bad;
+}
+
+.compositionRiskHeader > strong {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.compositionRiskHeader .hasRisk {
+  color: #ffb3b3;
+  background: #30151d;
+  border: 1px solid #6d313d;
+}
+
+.compositionRiskHeader .clear {
+  color: #a9e7ae;
+  background: #132719;
+  border: 1px solid #315f39;
+}
+
+.compositionRiskColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.compositionRiskColumns > article {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.riskColumnLabel {
+  color: #8e9bad;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.compositionRiskRow,
+.riskEmpty {
+  display: grid;
+  gap: 3px;
+  padding: 11px 12px;
+  border: 1px solid #283142;
+  border-left: 3px solid #f0b94d;
+  border-radius: 10px;
+  background: #0d121b;
+}
+
+.compositionRiskRow.high {
+  border-left-color: #ff6b6b;
+}
+
+.compositionRiskRow span,
+.compositionRiskRow small,
+.riskEmpty {
+  color: #8e9bad;
+  font-size: 12px;
+}
+
+.rotationRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 42px;
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid #283142;
+  border-radius: 10px;
+  background: #0d121b;
+}
+
+.rotationRow span {
+  color: #8e9bad;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.plannerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin: 24px 0 12px;
+}
+
+.plannerHeader p {
+  margin: 4px 0 0;
+}
+
+.plannerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.plannerActions small {
+  color: #8e9bad;
+}
+
+.primaryAction {
+  border-color: #f0b94d;
+  background: #6f4f13;
+}
+
+.parties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.party:last-child {
+  grid-column: 1 / -1;
+  width: 50%;
+  justify-self: center;
+}
+
+.party {
+  padding: 16px;
+}
+
+.party > header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.party > header span,
+.party > header small {
+  color: #8e9bad;
+}
+
+.party > header strong {
+  display: block;
+  font-size: 24px;
+}
+
+.raider {
+  --class: #888;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin: 7px 0;
+  padding: 9px;
+  border-left: 3px solid var(--class);
+  border-radius: 8px;
+  background: #0d121b;
+}
+
+.raider.absent {
+  opacity: .55;
+  background: #1a1117;
+}
+
+.raider.tentative {
+  background: #161827;
+}
+
+.raider.unknownStatus {
+  background: #141b23;
+}
+
+.crest {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--class) 28%, #101827);
+}
+
+.who {
+  min-width: 0;
+}
+
+.who div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.who em {
+  color: #c5d0e3;
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: .08em;
+}
+
+.who span,
+.who small,
+.dps span {
+  display: block;
+  font-size: 10px;
+}
+
+.replacementNote {
+  color: #f0b94d !important;
+  font-weight: 800;
+}
+
+.dps {
+  min-width: 92px;
+  text-align: right;
+}
+
+.dps .rvi {
+  color: #f0b94d;
+  font-weight: 800;
+}
+
+.benchPanel {
+  display: grid;
+  grid-template-columns: minmax(260px, 380px) 1fr;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 18px;
+}
+
+.benchChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: start;
+}
+
+.benchChips span {
+  --class: #888;
+  border: 1px solid #283142;
+  border-left: 3px solid var(--class);
+  border-radius: 10px;
+  background: #0d121b;
+  padding: 8px 10px;
+  display: grid;
+  min-width: 150px;
+}
+
+.druid { --class: #ff7c0a; }
+.warrior { --class: #c69b6d; }
+.rogue { --class: #fff468; }
+.shaman { --class: #0070dd; }
+.paladin { --class: #f48cba; }
+.hunter { --class: #aad372; }
+.warlock { --class: #8788ee; }
+.mage { --class: #3fc7eb; }
+.priest { --class: #fff; }
+.unknown { --class: #8e9bad; }
+
+@media (max-width: 1100px) {
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #222c40;
+  }
+
+  .sideNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics,
+  .profileCalendar,
+  .profileAbsenceBar,
+  .raidWideRiskColumns,
+  .profileRotation,
+  .compactCompGrid,
+  .riskGrid,
+  .riskAssessmentGrid,
+  .riskRaidSelector,
+  .riskPrototypeHero,
+  .compositionRiskColumns,
+  .rotationBoard,
+  .availabilityList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace,
+  .sidebar {
+    padding: 18px;
+  }
+
+  .hero,
+  .benchPanel {
+    display: block;
+  }
+
+  .calendarLayout,
+  .profileCalendar,
+  .profileAbsenceBar,
+  .raidWideRiskColumns,
+  .profileRotation,
+  .compactCompGrid,
+  .parties,
+  .metrics,
+  .riskGrid,
+  .riskAssessmentGrid,
+  .riskRaidSelector,
+  .riskPrototypeHero,
+  .compositionRiskColumns,
+  .rotationBoard,
+  .suggestedBenchGrid,
+  .prototypeStatusForm,
+  .availabilityList,
+  .sideNav {
+    grid-template-columns: 1fr;
+  }
+
+  .party:last-child {
+    grid-column: auto;
+    width: auto;
+  }
+
+  .availabilityRow,
+  .raider {
+    grid-template-columns: 1fr;
+  }
+
+  .dps {
+    text-align: left;
+  }
+}

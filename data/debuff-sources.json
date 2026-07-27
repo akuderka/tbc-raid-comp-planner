@@ -1,0 +1,155 @@
+[
+  {
+    "debuff": "Improved Expose Armor",
+    "providerSpec": "rogue",
+    "providerOverride": "Shortcutz",
+    "family": "Major armor",
+    "priority": "Preferred",
+    "notes": "Preferred over Sunder; Expose/Sunder do not stack.",
+    "currentRaidValue": 3717.0
+  },
+  {
+    "debuff": "Sunder Armor",
+    "providerSpec": "arms warrior",
+    "providerOverride": "",
+    "family": "Major armor",
+    "priority": "Fallback",
+    "notes": "Use only if Improved Expose Armor cannot be maintained.",
+    "currentRaidValue": 2893.0
+  },
+  {
+    "debuff": "Sunder Armor",
+    "providerSpec": "fury warrior",
+    "providerOverride": "",
+    "family": "Major armor",
+    "priority": "Fallback",
+    "notes": "Fallback provider.",
+    "currentRaidValue": 2893.0
+  },
+  {
+    "debuff": "Sunder Armor",
+    "providerSpec": "prot paladin",
+    "providerOverride": "",
+    "family": "Major armor",
+    "priority": "Fallback",
+    "notes": "Only if needed/possible.",
+    "currentRaidValue": 2893.0
+  },
+  {
+    "debuff": "Faerie Fire",
+    "providerSpec": "feral druid",
+    "providerOverride": "",
+    "family": "Minor armor",
+    "priority": "Primary/backup",
+    "notes": "Stacks with Expose/Sunder and CoR.",
+    "currentRaidValue": 1862.0
+  },
+  {
+    "debuff": "Faerie Fire",
+    "providerSpec": "boomkin",
+    "providerOverride": "Zaddy",
+    "family": "Minor armor",
+    "priority": "Primary/backup",
+    "notes": "Stacks with Expose/Sunder and CoR.",
+    "currentRaidValue": 1862.0
+  },
+  {
+    "debuff": "Curse of Recklessness",
+    "providerSpec": "destruction warlock",
+    "providerOverride": "Merlong",
+    "family": "Minor armor",
+    "priority": "Primary assignment",
+    "notes": "Second warlock is assumed CoR.",
+    "currentRaidValue": 1427.0
+  },
+  {
+    "debuff": "Curse of Elements",
+    "providerSpec": "affliction warlock",
+    "providerOverride": "Voodu",
+    "family": "Caster vulnerability",
+    "priority": "Primary assignment",
+    "notes": "First warlock is assumed CoE.",
+    "currentRaidValue": 1477.0
+  },
+  {
+    "debuff": "Misery",
+    "providerSpec": "shadow priest",
+    "providerOverride": "",
+    "family": "Spell hit",
+    "priority": "Primary",
+    "notes": "Any shadow priest can provide.",
+    "currentRaidValue": 823.0
+  },
+  {
+    "debuff": "Shadow Weaving",
+    "providerSpec": "shadow priest",
+    "providerOverride": "",
+    "family": "Shadow damage",
+    "priority": "Primary",
+    "notes": "Any shadow priest can provide.",
+    "currentRaidValue": 730.0
+  },
+  {
+    "debuff": "Improved Shadow Bolt",
+    "providerSpec": "destruction warlock",
+    "providerOverride": "",
+    "family": "Shadow damage",
+    "priority": "Primary",
+    "notes": "Any warlock with talent/rotation can maintain.",
+    "currentRaidValue": 0.0
+  },
+  {
+    "debuff": "Improved Shadow Bolt",
+    "providerSpec": "affliction warlock",
+    "providerOverride": "",
+    "family": "Shadow damage",
+    "priority": "Primary",
+    "notes": "Fallback/alternate provider.",
+    "currentRaidValue": 0.0
+  },
+  {
+    "debuff": "Expose Weakness",
+    "providerSpec": "survival hunter",
+    "providerOverride": "Milkbrother",
+    "family": "Attack power",
+    "priority": "Primary assignment",
+    "notes": "First hunter is assumed Survival.",
+    "currentRaidValue": 978.0
+  },
+  {
+    "debuff": "Mangle",
+    "providerSpec": "feral druid",
+    "providerOverride": "",
+    "family": "Bleed/physical",
+    "priority": "Primary",
+    "notes": "Any feral can provide.",
+    "currentRaidValue": 365.0
+  },
+  {
+    "debuff": "Blood Frenzy",
+    "providerSpec": "arms warrior",
+    "providerOverride": "Belross",
+    "family": "Physical damage",
+    "priority": "Primary assignment",
+    "notes": "First warrior is assumed Arms.",
+    "currentRaidValue": 949.0
+  },
+  {
+    "debuff": "Judgement of the Crusader",
+    "providerSpec": "ret paladin",
+    "providerOverride": "Vorles",
+    "family": "Holy damage",
+    "priority": "Primary",
+    "notes": "Ret paladin assignment.",
+    "currentRaidValue": 992.0
+  },
+  {
+    "debuff": "Improved Scorch",
+    "providerSpec": "fire mage",
+    "providerOverride": "",
+    "family": "Fire vulnerability",
+    "priority": "Conditional",
+    "notes": "Only relevant if running fire/fire-damage focus.",
+    "currentRaidValue": 314.0
+  }
+]

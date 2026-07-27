@@ -1,0 +1,15 @@
+{
+  "defaultScale": 0.5,
+  "players": {
+    "Poohdinni": { "scale": 1.0, "samples": 1, "basis": "Cat-form Morogrim observation; Bear-form observations excluded" },
+    "Belross": { "scale": 0.50, "samples": 4, "basis": "Morogrim median" },
+    "Khubjorn": { "scale": 0.66, "samples": 3, "basis": "Morogrim median" },
+    "Drederick": { "scale": 0.61, "samples": 3, "basis": "Morogrim median" },
+    "Caargo": { "scale": 0.40, "samples": 3, "basis": "Morogrim median" },
+    "Maclaurin": { "scale": 0.22, "samples": 3, "basis": "Morogrim median" },
+    "Merlong": { "scale": 0.39, "samples": 4, "basis": "Morogrim median" },
+    "Tasidust": { "scale": 0.55, "samples": 4, "basis": "Morogrim median" },
+    "Nukum": { "scale": 0.59, "samples": 4, "basis": "Morogrim median including Nukumblast alias" },
+    "Milkbrother": { "scale": 0.64, "samples": 3, "basis": "Morogrim median" }
+  }
+}
