@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import baselines from '../../../data/dps-baselines.json';
-import buffMatrix from '../../../data/buff-matrix.json';
-import debuffValues from '../../../data/debuff-values.json';
-import debuffSources from '../../../data/debuff-sources.json';
-import calibration from '../../../data/player-calibration.json';
-import rosterData from '../../../data/roster.json';
+import baselines from './dps-baselines.json';
+import buffMatrix from './buff-matrix.json';
+import debuffValues from './debuff-values.json';
+import debuffSources from './debuff-sources.json';
+import calibration from './player-calibration.json';
+import rosterData from './roster.json';
 
 type Tab = 'profile' | 'calendar' | 'planner' | 'risk';
 type Availability = 'available' | 'tentative' | 'unknown' | 'absent';
