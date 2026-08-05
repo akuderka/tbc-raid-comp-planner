@@ -20,6 +20,10 @@ body {
 .benchChips button{margin:4px;padding:7px 9px;border-radius:999px}
 .selectedChip{background:#7b65e8!important;color:#fff!important}
 .benchSuggestions{margin-top:18px}
+.raidDatePicker{display:grid;gap:4px;color:#9ba9bd;font-size:12px;font-weight:700}
+.raidDatePicker input{min-width:155px}
+.groupScoreStrip{display:flex;align-items:baseline;gap:12px;margin:12px 0;padding:10px 14px;border:1px solid #283142;border-radius:10px;background:#111722}
+.groupScoreStrip span,.groupScoreStrip small{color:#9ba9bd}.groupScoreStrip strong{font-size:20px;color:#e8dcff}.groupScoreStrip small{margin-left:auto}
 .benchSuggestionHeader{display:flex;justify-content:space-between;gap:20px;align-items:start}
 .benchSuggestionHeader h3,.benchSuggestionHeader p{margin:0}
 .benchSuggestionHeader>small{max-width:360px;color:#9ba9bd}

@@ -84,6 +84,95 @@ function fairnessPool(player:RosterPlayer):RolePool {
   return isHealer(player) ? 'healer' : 'dps';
 }
 
+type GroupBuffRule = { giver:string; effect:string; cumulative?:boolean; values:Record<string,number> };
+
+// Compact, deployment-safe form of the original buff matrix. Zero-value pairs are omitted.
+const GROUP_BUFF_RULES:GroupBuffRule[] = [
+  { giver:'feral druid', effect:'Leader of the Pack', values:{ 'survival hunter':110, 'beast master hunter':131, 'ret paladin':88, rogue:80, 'enhance shaman':82, 'arms warrior':88, 'fury warrior':110 } },
+  { giver:'boomkin', effect:'Moonkin Aura', values:{ 'arcane mage':81, 'shadow priest':10, 'elemental shaman':69, 'affliction warlock':67, 'destruction warlock':87 } },
+  { giver:'beast master hunter', effect:'Ferocious Inspiration', cumulative:true, values:{ 'feral druid':78, boomkin:54, 'survival hunter':80, 'beast master hunter':80, 'arcane mage':70, 'ret paladin':65, 'shadow priest':50, rogue:60, 'enhance shaman':62, 'affliction warlock':67, 'destruction warlock':70, 'arms warrior':63, 'fury warrior':70 } },
+  { giver:'ret paladin', effect:'Retribution party synergy', cumulative:true, values:{ 'feral druid':45, boomkin:37, 'survival hunter':64, 'beast master hunter':60, 'arcane mage':50, rogue:40, 'enhance shaman':40, 'elemental shaman':33, 'affliction warlock':43, 'destruction warlock':47, 'arms warrior':40, 'fury warrior':53 } },
+  { giver:'shadow priest', effect:'Vampiric Touch', cumulative:true, values:{ boomkin:8, 'arcane mage':90, 'elemental shaman':30, 'affliction warlock':60, 'destruction warlock':60 } },
+  { giver:'enhance shaman', effect:'Windfury / Enhancement package', values:{ 'feral druid':328, boomkin:92, 'survival hunter':311, 'beast master hunter':200, 'arcane mage':92, 'ret paladin':484, rogue:371, 'affliction warlock':100, 'destruction warlock':134, 'arms warrior':420, 'fury warrior':478 } },
+  { giver:'resto shaman', effect:'Mana Tide / Restoration support', values:{ 'feral druid':175, boomkin:98, 'survival hunter':170, 'beast master hunter':150, 'arcane mage':160, 'ret paladin':312, 'shadow priest':79, rogue:190, 'elemental shaman':20, 'affliction warlock':100, 'destruction warlock':134, 'arms warrior':285, 'fury warrior':300 } },
+  { giver:'elemental shaman', effect:'Totem of Wrath', values:{ 'feral druid':175, boomkin:172, 'survival hunter':170, 'beast master hunter':150, 'arcane mage':175, 'ret paladin':312, 'shadow priest':86, rogue:190, 'affliction warlock':210, 'destruction warlock':266, 'arms warrior':285, 'fury warrior':300 } },
+  { giver:'arms warrior', effect:'Battle Shout', values:{ 'feral druid':111, 'survival hunter':100, 'beast master hunter':116, 'ret paladin':135, rogue:160, 'enhance shaman':165 } },
+  { giver:'fury warrior', effect:'Battle Shout', values:{ 'feral druid':111, 'survival hunter':100, 'beast master hunter':116, 'ret paladin':135, rogue:160, 'enhance shaman':165 } },
+];
+
+function matrixSpec(player:RosterPlayer) {
+  const key = `${normalize(player.class)}:${normalize(player.spec)}`;
+  const specs:Record<string,string> = {
+    'druid:feral':'feral druid', 'druid:balance':'boomkin', 'druid:restoration':'resto druid',
+    'hunter:survival':'survival hunter', 'hunter:beast mastery':'beast master hunter',
+    'mage:fire':'fire mage', 'mage:arcane':'arcane mage',
+    'paladin:retribution':'ret paladin', 'paladin:protection':'prot paladin', 'paladin:holy':'holy paladin',
+    'priest:shadow':'shadow priest', 'priest:holy':'holy priest', 'priest:discipline':'discipline priest',
+    'rogue:combat':'rogue', 'shaman:enhancement':'enhance shaman', 'shaman:restoration':'resto shaman', 'shaman:elemental':'elemental shaman',
+    'warlock:affliction':'affliction warlock', 'warlock:destruction':'destruction warlock',
+    'warrior:arms':'arms warrior', 'warrior:fury':'fury warrior',
+  };
+  return specs[key] ?? `${normalize(player.spec)} ${normalize(player.class)}`;
+}
+
+function groupSynergyScore(group:RosterPlayer[]) {
+  let score = 0;
+  for (const rule of GROUP_BUFF_RULES) {
+    const providers = group.filter(player => matrixSpec(player) === rule.giver).length;
+    if (!providers) continue;
+    const instances = rule.cumulative ? providers : 1;
+    score += group.reduce((sum, player) => sum + (rule.values[matrixSpec(player)] ?? 0) * instances, 0);
+  }
+  return score;
+}
+
+function raidGroupScore(groups:RosterPlayer[][]) {
+  let score = groups.reduce((sum, group) => sum + groupSynergyScore(group), 0);
+  const supportCount = (group:RosterPlayer[]) => group.filter(player => isHealer(player) || isClass(player, 'Paladin') && isSpec(player, 'Protection')).length;
+  const supportGroup = [...groups].sort((a,b) => supportCount(b) - supportCount(a))[0] ?? [];
+  const stackedSupport = supportCount(supportGroup);
+  if (stackedSupport >= 4) score += 1200;
+
+  const active = groups.flat();
+  const physicalCount = active.filter(player => ['hunter','warrior','rogue'].includes(normalize(player.class)) || ['retribution','enhancement','feral'].includes(normalize(player.spec))).length;
+  const casterCount = active.filter(player => ['mage','warlock'].includes(normalize(player.class)) || ['shadow','balance','elemental'].includes(normalize(player.spec))).length;
+  const preferredOrphan = physicalCount > casterCount ? 'survival hunter' : 'affliction warlock';
+  const partyProviders = new Set(GROUP_BUFF_RULES.map(rule => rule.giver));
+  for (const player of supportGroup.filter(player => !isHealer(player) && !(isClass(player, 'Paladin') && isSpec(player, 'Protection')))) {
+    const spec = matrixSpec(player);
+    if (spec === preferredOrphan) score += 700;
+    else if (spec === 'survival hunter' || spec === 'affliction warlock') score += 500;
+    else if (['rogue','destruction warlock','arcane mage'].includes(spec)) score += 275;
+    else if (partyProviders.has(spec)) score -= 500;
+  }
+  return score;
+}
+
+function optimizeRaidGroups(players:RosterPlayer[]) {
+  if (!players.length) return [] as RosterPlayer[][];
+  const padded:(RosterPlayer | null)[] = [...players.slice(0, 25)];
+  while (padded.length < 25) padded.push(null);
+  let best = Array.from({ length:5 }, (_, index) => padded.slice(index * 5, index * 5 + 5));
+  const score = (groups:(RosterPlayer | null)[][]) => raidGroupScore(groups.map(group => group.filter(Boolean) as RosterPlayer[]));
+
+  for (let pass = 0; pass < 12; pass += 1) {
+    let improved = false;
+    let bestScore = score(best);
+    for (let left = 0; left < 25; left += 1) {
+      for (let right = left + 1; right < 25; right += 1) {
+        const candidate = best.map(group => [...group]);
+        const leftGroup = Math.floor(left / 5); const leftSlot = left % 5;
+        const rightGroup = Math.floor(right / 5); const rightSlot = right % 5;
+        [candidate[leftGroup][leftSlot], candidate[rightGroup][rightSlot]] = [candidate[rightGroup][rightSlot], candidate[leftGroup][leftSlot]];
+        const candidateScore = score(candidate);
+        if (candidateScore > bestScore) { best = candidate; bestScore = candidateScore; improved = true; }
+      }
+    }
+    if (!improved) break;
+  }
+  return best.map(group => group.filter(Boolean) as RosterPlayer[]);
+}
+
 function raidRisks(active:RosterPlayer[], groups:RosterPlayer[][]):Risk[] {
   const risks:Risk[] = [];
   const add = (category:Risk['category'], name:string, detail:string, level:Risk['level'] = 'missing') =>
@@ -313,6 +402,7 @@ export default function RaidRiskAssessmentProfile() {
     .filter(Boolean) as RosterPlayer[]);
   const active = roster.filter(player => !absent.has(player.name) && !benched.has(player.name));
   const risks = raidRisks(active, activeGroups);
+  const currentGroupScore = raidGroupScore(activeGroups);
   const benchSuggestions = useMemo(
     () => suggestBenches(roster, buckets, absent, benchCounts, raids, selectedRaid),
     [roster, buckets, selectedRaidId, selectedRaid?.absences, benchCounts, raids],
@@ -347,6 +437,18 @@ export default function RaidRiskAssessmentProfile() {
     setRaids(current => [...current, raid].sort((a,b) => a.date.localeCompare(b.date)));
     setSelectedRaidId(raid.id);
     setTab('planner');
+  }
+
+  function selectRaidDate(date:string) {
+    if (!date) return;
+    const existing = raids.find(raid => raid.date === date);
+    if (existing) {
+      setSelectedRaidId(existing.id);
+      return;
+    }
+    const raid: Raid = { id:`raid-${date}-${Date.now()}`, date, title:'Tuesday Raid', absences:[], benches:[] };
+    setRaids(current => [...current, raid].sort((a,b) => a.date.localeCompare(b.date)));
+    setSelectedRaidId(raid.id);
   }
 
   function updateRaid(change:Partial<Raid>) {
@@ -390,6 +492,17 @@ export default function RaidRiskAssessmentProfile() {
       return next;
     });
     setDragged(null);
+  }
+
+  function optimizeCurrentGroups() {
+    if (active.length > 25) return;
+    const activeNames = new Set(active.map(player => player.name));
+    const ordered = buckets.flat().map(name => rosterByName.get(name)).filter(player => player && activeNames.has(player.name)) as RosterPlayer[];
+    const alreadyOrdered = new Set(ordered.map(player => player.name));
+    active.forEach(player => { if (!alreadyOrdered.has(player.name)) ordered.push(player); });
+    const optimized = optimizeRaidGroups(ordered);
+    const out = roster.filter(player => !activeNames.has(player.name)).map(player => player.name);
+    setBuckets([...optimized.map(group => group.map(player => player.name)), out]);
   }
 
   return <main>
@@ -443,11 +556,20 @@ export default function RaidRiskAssessmentProfile() {
       {roster.length > 0 && tab === 'planner' && <>
         <section className="plannerHeader">
           <div><h3>Compact comp planner</h3><p>Drag players between five groups and the bench. Select a raid week to apply absences and benches.</p></div>
+          <label className="raidDatePicker">Raid date
+            <input type="date" value={selectedRaid?.date ?? ''} onChange={event => selectRaidDate(event.target.value)} />
+          </label>
           <select value={selectedRaidId} onChange={event => setSelectedRaidId(event.target.value)}>
             <option value="">No raid selected</option>
             {raids.map(raid => <option key={raid.id} value={raid.id}>{raid.date} · {raid.title}</option>)}
           </select>
+          <button disabled={active.length > 25} onClick={optimizeCurrentGroups}>Optimize groups</button>
           <button onClick={() => setBuckets(freshBuckets(roster))}>Reset from roster order</button>
+        </section>
+
+        <section className="groupScoreStrip">
+          <span>Buff-matrix group score</span><strong>{Math.round(currentGroupScore).toLocaleString()}</strong>
+          <small>{active.length > 25 ? `Select ${active.length - 25} more benches before optimizing.` : 'Higher is better; raid-wide coverage is handled by the bench recommender.'}</small>
         </section>
 
         <div className="compactCompGrid">

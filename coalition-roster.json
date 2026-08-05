@@ -1,0 +1,39 @@
+[
+  { "name": "Silent", "class": "Paladin", "spec": "Protection", "role": "Tank", "benchEligible": false },
+  { "name": "DevoutCoke", "class": "Paladin", "spec": "Holy", "role": "Healer", "benchEligible": true },
+  { "name": "Sera", "class": "Priest", "spec": "Holy", "role": "Healer", "benchEligible": true },
+  { "name": "Sanctity", "class": "Priest", "spec": "Holy", "role": "Healer", "benchEligible": true },
+  { "name": "toodles", "class": "Shaman", "spec": "Restoration", "role": "Healer", "benchEligible": true },
+  { "name": "jessakira", "class": "Druid", "spec": "Restoration", "role": "Healer", "benchEligible": true },
+
+  { "name": "Trumie", "class": "Shaman", "spec": "Elemental", "role": "DPS", "benchEligible": true },
+  { "name": "Zaddy", "class": "Druid", "spec": "Balance", "role": "DPS", "benchEligible": true },
+  { "name": "Shortcutz", "class": "Rogue", "spec": "Combat", "role": "DPS", "benchEligible": true },
+  { "name": "Vorles", "class": "Paladin", "spec": "Retribution", "role": "DPS", "benchEligible": true },
+
+  { "name": "Belross", "class": "Warrior", "spec": "Arms", "eligibleSpecs": ["Arms", "Fury"], "role": "Tank/DPS", "benchEligible": true },
+  { "name": "Drederick", "class": "Warrior", "spec": "Fury", "eligibleSpecs": ["Arms", "Fury"], "role": "Tank/DPS", "benchEligible": true },
+  { "name": "Poohdinni", "class": "Druid", "spec": "Feral", "role": "Tank/DPS", "benchEligible": true },
+  { "name": "Raidiant", "class": "Druid", "spec": "Feral", "role": "Tank/DPS", "benchEligible": true },
+
+  { "name": "Khubjorn", "class": "Shaman", "spec": "Enhancement", "role": "DPS", "benchEligible": true },
+  { "name": "Lizardblades", "class": "Shaman", "spec": "Enhancement", "role": "DPS", "benchEligible": true },
+
+  { "name": "Milkbrother", "class": "Hunter", "spec": "Beast Mastery", "eligibleSpecs": ["Beast Mastery", "Survival"], "role": "DPS", "benchEligible": true },
+  { "name": "Caargo", "class": "Hunter", "spec": "Beast Mastery", "eligibleSpecs": ["Beast Mastery", "Survival"], "role": "DPS", "benchEligible": true },
+  { "name": "Maclaurin", "class": "Hunter", "spec": "Survival", "eligibleSpecs": ["Beast Mastery", "Survival"], "role": "DPS", "benchEligible": true },
+  { "name": "Terevia", "class": "Hunter", "spec": "Beast Mastery", "eligibleSpecs": ["Beast Mastery", "Survival"], "role": "DPS", "benchEligible": true },
+
+  { "name": "Tasidust", "class": "Mage", "spec": "Arcane", "eligibleSpecs": ["Arcane"], "role": "DPS", "benchEligible": true },
+  { "name": "Nukum", "class": "Mage", "spec": "Arcane", "eligibleSpecs": ["Arcane", "Fire"], "role": "DPS", "benchEligible": true },
+  { "name": "eazi", "class": "Mage", "spec": "Arcane", "eligibleSpecs": ["Arcane", "Fire"], "role": "DPS", "benchEligible": true },
+
+  { "name": "Voodu", "class": "Warlock", "spec": "Destruction", "eligibleSpecs": ["Affliction", "Destruction"], "role": "DPS", "benchEligible": true },
+  { "name": "Merlong", "class": "Warlock", "spec": "Destruction", "eligibleSpecs": ["Affliction", "Destruction"], "role": "DPS", "benchEligible": true },
+  { "name": "Jysu", "class": "Warlock", "spec": "Destruction", "eligibleSpecs": ["Affliction", "Destruction"], "role": "DPS", "benchEligible": true },
+  { "name": "Datalus", "class": "Warlock", "spec": "Destruction", "eligibleSpecs": ["Affliction", "Destruction"], "role": "DPS", "benchEligible": true },
+  { "name": "annalhistory", "class": "Warlock", "spec": "Destruction", "eligibleSpecs": ["Affliction", "Destruction"], "role": "DPS", "benchEligible": true },
+
+  { "name": "Lanadelpray", "class": "Priest", "spec": "Shadow", "role": "DPS", "benchEligible": true },
+  { "name": "Tubfarter", "class": "Priest", "spec": "Shadow", "role": "DPS", "benchEligible": true }
+]
