@@ -19,6 +19,8 @@ type Raid = {
   title:string;
   absences:string[];
   benches:string[];
+  specOverrides?:Record<string,string>;
+  assignments?:string[];
 };
 type Risk = {
   category:'Raid buff' | 'Raid debuff' | 'Group buff';
@@ -148,29 +150,92 @@ function raidGroupScore(groups:RosterPlayer[][]) {
   return score;
 }
 
-function optimizeRaidGroups(players:RosterPlayer[]) {
-  if (!players.length) return [] as RosterPlayer[][];
-  const padded:(RosterPlayer | null)[] = [...players.slice(0, 25)];
-  while (padded.length < 25) padded.push(null);
-  let best = Array.from({ length:5 }, (_, index) => padded.slice(index * 5, index * 5 + 5));
-  const score = (groups:(RosterPlayer | null)[][]) => raidGroupScore(groups.map(group => group.filter(Boolean) as RosterPlayer[]));
-
-  for (let pass = 0; pass < 12; pass += 1) {
-    let improved = false;
-    let bestScore = score(best);
-    for (let left = 0; left < 25; left += 1) {
-      for (let right = left + 1; right < 25; right += 1) {
-        const candidate = best.map(group => [...group]);
-        const leftGroup = Math.floor(left / 5); const leftSlot = left % 5;
-        const rightGroup = Math.floor(right / 5); const rightSlot = right % 5;
-        [candidate[leftGroup][leftSlot], candidate[rightGroup][rightSlot]] = [candidate[rightGroup][rightSlot], candidate[leftGroup][leftSlot]];
-        const candidateScore = score(candidate);
-        if (candidateScore > bestScore) { best = candidate; bestScore = candidateScore; improved = true; }
-      }
-    }
-    if (!improved) break;
+function assignCoverageSpecs(players:RosterPlayer[]) {
+  const assigned = players.map(player => ({ ...player }));
+  const canPlay = (player:RosterPlayer, spec:string) => (player.eligibleSpecs ?? [player.spec]).some(value => normalize(value) === normalize(spec));
+  if (!assigned.some(player => isClass(player, 'Warrior') && isSpec(player, 'Arms'))) {
+    const warrior = assigned.find(player => isClass(player, 'Warrior') && canPlay(player, 'Arms'));
+    if (warrior) warrior.spec = 'Arms';
   }
-  return best.map(group => group.filter(Boolean) as RosterPlayer[]);
+  const datalus = assigned.find(player => normalize(player.name) === 'datalus' && isClass(player, 'Warlock'));
+  if (datalus && canPlay(datalus, 'Affliction')) datalus.spec = 'Affliction';
+  else if (!assigned.some(player => isClass(player, 'Warlock') && isSpec(player, 'Affliction'))) {
+    const warlock = assigned.find(player => isClass(player, 'Warlock') && canPlay(player, 'Affliction'));
+    if (warlock) warlock.spec = 'Affliction';
+  }
+  return assigned;
+}
+
+function buildArchetypeGroups(players:RosterPlayer[]) {
+  const remaining = [...assignCoverageSpecs(players.slice(0, 25))];
+  const groups:RosterPlayer[][] = [[], [], [], [], []];
+  const take = (group:number, predicate:(player:RosterPlayer) => boolean) => {
+    if (groups[group].length >= 5) return undefined;
+    const index = remaining.findIndex(predicate);
+    if (index < 0) return undefined;
+    const [player] = remaining.splice(index, 1);
+    groups[group].push(player);
+    return player;
+  };
+  const takeSpec = (group:number, className:string, spec:string) => take(group, player => isClass(player, className) && isSpec(player, spec));
+  const fill = (group:number, predicate:(player:RosterPlayer) => boolean = () => true) => {
+    while (groups[group].length < 5 && take(group, predicate));
+  };
+
+  // Complete melee package.
+  takeSpec(0, 'Druid', 'Feral');
+  take(0, player => isClass(player, 'Rogue'));
+  takeSpec(0, 'Warrior', 'Arms');
+  takeSpec(0, 'Paladin', 'Retribution');
+  takeSpec(0, 'Shaman', 'Enhancement');
+
+  // Hunter/physical package.
+  takeSpec(1, 'Druid', 'Feral');
+  takeSpec(1, 'Warrior', 'Fury');
+  takeSpec(1, 'Shaman', 'Enhancement');
+  fill(1, player => isClass(player, 'Hunter'));
+
+  // Warlock package; keep Affliction available for the support-group orphan.
+  takeSpec(2, 'Shaman', 'Elemental');
+  takeSpec(2, 'Druid', 'Balance');
+  fill(2, player => isClass(player, 'Warlock') && isSpec(player, 'Destruction'));
+
+  // Arcane mana package.
+  takeSpec(3, 'Shaman', 'Restoration');
+  takeSpec(3, 'Priest', 'Shadow');
+  fill(3, player => isClass(player, 'Mage') && isSpec(player, 'Arcane'));
+  fill(3, player => isClass(player, 'Priest') && isSpec(player, 'Shadow'));
+
+  // Tank/healer package.
+  takeSpec(4, 'Paladin', 'Protection');
+  fill(4, player => isHealer(player) && !(isClass(player, 'Shaman') && isSpec(player, 'Restoration')));
+
+  // Repair incomplete physical archetypes before selecting an orphan.
+  const physical = (player:RosterPlayer) => ['hunter','warrior','rogue'].includes(normalize(player.class)) || ['retribution','enhancement','feral'].includes(normalize(player.spec));
+  fill(0, physical);
+  fill(1, physical);
+  fill(2, player => isClass(player, 'Warlock'));
+  fill(3, player => ['mage','warlock'].includes(normalize(player.class)) || ['shadow','balance','elemental'].includes(normalize(player.spec)));
+
+  const physicalSurplus = remaining.filter(physical).length > remaining.filter(player => ['mage','warlock'].includes(normalize(player.class)) || ['shadow','balance','elemental'].includes(normalize(player.spec))).length;
+  let orphan = physicalSurplus
+    ? remaining.find(player => isClass(player, 'Hunter'))
+    : remaining.find(player => isClass(player, 'Warlock') && isSpec(player, 'Affliction'));
+  orphan ??= remaining.find(player => isSpec(player, 'Survival'))
+    ?? remaining.find(player => isSpec(player, 'Affliction'))
+    ?? remaining.find(player => ['rogue','destruction warlock','arcane mage'].includes(matrixSpec(player)))
+    ?? remaining[0];
+  if (orphan && isClass(orphan, 'Hunter')) orphan.spec = 'Survival';
+  if (orphan && isClass(orphan, 'Warlock')) orphan.spec = 'Affliction';
+  if (orphan) take(4, player => player.name === orphan!.name);
+
+  // If the orphan was not a Hunter, assign Survival inside the Hunter group.
+  if (!groups.flat().some(player => isClass(player, 'Hunter') && isSpec(player, 'Survival'))) {
+    const hunter = groups[1].find(player => isClass(player, 'Hunter') && (player.eligibleSpecs ?? [player.spec]).some(spec => normalize(spec) === 'survival'));
+    if (hunter) hunter.spec = 'Survival';
+  }
+  for (let group = 0; group < 5; group += 1) fill(group);
+  return groups;
 }
 
 function raidRisks(active:RosterPlayer[], groups:RosterPlayer[][]):Risk[] {
@@ -304,10 +369,11 @@ function suggestBenches(
 
   return combinations(eligible, required).map(candidatePlayers => {
     const candidateNames = new Set(candidatePlayers.map(player => player.name));
-    const active = available.filter(player => !candidateNames.has(player.name));
+    const active = assignCoverageSpecs(available.filter(player => !candidateNames.has(player.name)));
+    const activeByName = new Map(active.map(player => [player.name, player]));
     const groups = buckets.slice(0, 5).map(group => group
       .filter(name => !absences.has(name) && !candidateNames.has(name))
-      .map(name => roster.find(player => player.name === name))
+      .map(name => activeByName.get(name))
       .filter(Boolean) as RosterPlayer[]);
     const risks = raidRisks(active, groups);
     let score = 0;
@@ -396,11 +462,15 @@ export default function RaidRiskAssessmentProfile() {
   const selectedRaid = raids.find(raid => raid.id === selectedRaidId);
   const absent = new Set(selectedRaid?.absences ?? []);
   const benched = new Set(selectedRaid?.benches ?? []);
+  const specOverrides = selectedRaid?.specOverrides ?? {};
+  const active = roster
+    .filter(player => !absent.has(player.name) && !benched.has(player.name))
+    .map(player => ({ ...player, spec:specOverrides[player.name] ?? player.spec }));
+  const activeByName = new Map(active.map(player => [player.name, player]));
   const activeGroups = buckets.slice(0, 5).map(group => group
     .filter(name => !absent.has(name) && !benched.has(name))
-    .map(name => rosterByName.get(name))
+    .map(name => activeByName.get(name))
     .filter(Boolean) as RosterPlayer[]);
-  const active = roster.filter(player => !absent.has(player.name) && !benched.has(player.name));
   const risks = raidRisks(active, activeGroups);
   const currentGroupScore = raidGroupScore(activeGroups);
   const benchSuggestions = useMemo(
@@ -500,7 +570,18 @@ export default function RaidRiskAssessmentProfile() {
     const ordered = buckets.flat().map(name => rosterByName.get(name)).filter(player => player && activeNames.has(player.name)) as RosterPlayer[];
     const alreadyOrdered = new Set(ordered.map(player => player.name));
     active.forEach(player => { if (!alreadyOrdered.has(player.name)) ordered.push(player); });
-    const optimized = optimizeRaidGroups(ordered);
+    const optimized = buildArchetypeGroups(ordered);
+    const optimizedPlayers = optimized.flat();
+    const overrides = Object.fromEntries(optimizedPlayers
+      .filter(player => rosterByName.get(player.name)?.spec !== player.spec)
+      .map(player => [player.name, player.spec]));
+    const assignments = optimizedPlayers
+      .filter(player => overrides[player.name])
+      .map(player => `${player.name}: ${rosterByName.get(player.name)?.spec} -> ${player.spec}`);
+    const affliction = optimizedPlayers.find(player => isClass(player, 'Warlock') && isSpec(player, 'Affliction'));
+    if (affliction) assignments.push(`${affliction.name}: Affliction + Curse of Elements`);
+    if (optimizedPlayers.filter(player => isClass(player, 'Warlock')).length > 1) assignments.push('Assign Curse of Recklessness to a second Warlock');
+    updateRaid({ specOverrides:overrides, assignments });
     const out = roster.filter(player => !activeNames.has(player.name)).map(player => player.name);
     setBuckets([...optimized.map(group => group.map(player => player.name)), out]);
   }
@@ -568,9 +649,14 @@ export default function RaidRiskAssessmentProfile() {
         </section>
 
         <section className="groupScoreStrip">
-          <span>Buff-matrix group score</span><strong>{Math.round(currentGroupScore).toLocaleString()}</strong>
-          <small>{active.length > 25 ? `Select ${active.length - 25} more benches before optimizing.` : 'Higher is better; raid-wide coverage is handled by the bench recommender.'}</small>
+          <span>Archetype group score</span><strong>{Math.round(currentGroupScore).toLocaleString()}</strong>
+          <small>{active.length > 25 ? `Select ${active.length - 25} more benches before optimizing.` : 'Builds melee, Hunter, Warlock, mana, and tank/healer packages; then assigns support specs.'}</small>
         </section>
+
+        {selectedRaid?.assignments?.length ? <section className="assignmentStrip">
+          <strong>Optimizer assignments</strong>
+          {selectedRaid.assignments.map(item => <span key={item}>{item}</span>)}
+        </section> : null}
 
         <div className="compactCompGrid">
           {buckets.map((bucket, bucketIndex) => <section className={`compactParty ${bucketIndex === 5 ? 'compactBench' : ''}`} key={bucketIndex}>
@@ -578,7 +664,8 @@ export default function RaidRiskAssessmentProfile() {
             <div className="compactSlots">
               {Array.from({ length:Math.max(5, bucket.length + 1) }, (_, index) => {
                 const name = bucket[index];
-                const player = name ? rosterByName.get(name) : undefined;
+                const player = name ? (activeByName.get(name) ?? rosterByName.get(name)) : undefined;
+                const originalSpec = name ? rosterByName.get(name)?.spec : undefined;
                 return <div
                   key={`${name ?? 'empty'}-${index}`}
                   className={`compactSlot ${player ? player.class.toLowerCase() : 'empty'} ${absent.has(name) ? 'absent' : ''}`}
@@ -589,7 +676,7 @@ export default function RaidRiskAssessmentProfile() {
                   onDrop={() => movePlayer(bucketIndex, index)}
                 >
                   <span className="compactClassIcon">{player?.class[0] ?? ''}</span>
-                  <div>{player ? <><strong>{player.name}</strong><small>{player.spec} {player.class} · {player.role}</small></> : <span className="emptySlotLabel">Drop here</span>}</div>
+                  <div>{player ? <><strong>{player.name}</strong><small>{player.spec} {player.class} · {player.role}{originalSpec !== player.spec ? ' (assigned)' : ''}</small></> : <span className="emptySlotLabel">Drop here</span>}</div>
                 </div>;
               })}
             </div>

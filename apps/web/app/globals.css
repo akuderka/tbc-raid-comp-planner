@@ -24,6 +24,7 @@ body {
 .raidDatePicker input{min-width:155px}
 .groupScoreStrip{display:flex;align-items:baseline;gap:12px;margin:12px 0;padding:10px 14px;border:1px solid #283142;border-radius:10px;background:#111722}
 .groupScoreStrip span,.groupScoreStrip small{color:#9ba9bd}.groupScoreStrip strong{font-size:20px;color:#e8dcff}.groupScoreStrip small{margin-left:auto}
+.assignmentStrip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px;padding:10px 14px;border:1px solid #384568;border-radius:10px;background:#171d2c}.assignmentStrip strong{margin-right:4px}.assignmentStrip span{padding:4px 8px;border-radius:999px;background:#242d44;color:#cbd8f3;font-size:12px}
 .benchSuggestionHeader{display:flex;justify-content:space-between;gap:20px;align-items:start}
 .benchSuggestionHeader h3,.benchSuggestionHeader p{margin:0}
 .benchSuggestionHeader>small{max-width:360px;color:#9ba9bd}
