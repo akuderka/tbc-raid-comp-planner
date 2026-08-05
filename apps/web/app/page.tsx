@@ -346,7 +346,6 @@ function suggestBenches(
   roster:RosterPlayer[],
   buckets:string[][],
   absences:Set<string>,
-  benchCounts:Record<string,number>,
   raids:Raid[],
   selectedRaid?:Raid,
 ):BenchSuggestion[] {
@@ -358,16 +357,20 @@ function suggestBenches(
   const eligible = available.filter(player => fairnessPool(player) !== 'fixed');
   if (eligible.length < required) return [];
   const priorRaids = raids.filter(raid => raid.date < selectedRaid.date).sort((a,b) => b.date.localeCompare(a.date));
+  const historicalCounts:Record<string,number> = {};
+  priorRaids.forEach(raid => raid.benches.forEach(name => { historicalCounts[name] = (historicalCounts[name] ?? 0) + 1; }));
   const lastBench = new Set(priorRaids[0]?.benches ?? []);
   const groupByPlayer = new Map<string,number>();
   buckets.forEach((group, index) => group.forEach(name => groupByPlayer.set(name, index)));
   const poolMinimum = (player:RosterPlayer) => {
     const pool = fairnessPool(player);
-    const peers = eligible.filter(candidate => fairnessPool(candidate) === pool);
-    return peers.length ? Math.min(...peers.map(candidate => benchCounts[candidate.name] ?? 0)) : 0;
+    const peers = roster.filter(candidate => fairnessPool(candidate) === pool);
+    return peers.length ? Math.min(...peers.map(candidate => historicalCounts[candidate.name] ?? 0)) : 0;
   };
+  const roundEligible = eligible.filter(player => (historicalCounts[player.name] ?? 0) === poolMinimum(player));
+  if (roundEligible.length < required) return [];
 
-  return combinations(eligible, required).map(candidatePlayers => {
+  return combinations(roundEligible, required).map(candidatePlayers => {
     const candidateNames = new Set(candidatePlayers.map(player => player.name));
     const active = assignCoverageSpecs(available.filter(player => !candidateNames.has(player.name)));
     const activeByName = new Map(active.map(player => [player.name, player]));
@@ -402,10 +405,8 @@ function suggestBenches(
     candidatePlayers.forEach(player => {
       const group = groupByPlayer.get(player.name);
       if (group != null && group < 5) grouped.set(group, (grouped.get(group) ?? 0) + 1);
-      const count = benchCounts[player.name] ?? 0;
-      const minimum = poolMinimum(player);
+      const count = historicalCounts[player.name] ?? 0;
       score += count * 110;
-      if (count > minimum) { score += 2500; reasons.push(`${player.name} has already sat more than the minimum in the ${fairnessPool(player)} pool`); }
       if (lastBench.has(player.name)) { score += 500; reasons.push(`${player.name} sat the previous raid`); }
       if (groupByPlayer.get(player.name) === 5) score -= 30;
     });
@@ -437,6 +438,7 @@ export default function RaidRiskAssessmentProfile() {
   const [newRaidDate, setNewRaidDate] = useState('');
   const [newRaidTitle, setNewRaidTitle] = useState('Tuesday Raid');
   const [hydrated, setHydrated] = useState(false);
+  const [showRosterEditor, setShowRosterEditor] = useState(false);
 
   useEffect(() => {
     try {
@@ -474,10 +476,28 @@ export default function RaidRiskAssessmentProfile() {
   const risks = raidRisks(active, activeGroups);
   const currentGroupScore = raidGroupScore(activeGroups);
   const benchSuggestions = useMemo(
-    () => suggestBenches(roster, buckets, absent, benchCounts, raids, selectedRaid),
-    [roster, buckets, selectedRaidId, selectedRaid?.absences, benchCounts, raids],
+    () => suggestBenches(roster, buckets, absent, raids, selectedRaid),
+    [roster, buckets, selectedRaidId, selectedRaid?.absences, raids],
   );
   const requiredBenchCount = Math.max(0, roster.length - absent.size - 25);
+  const priorBenchCounts = useMemo(() => {
+    const counts:Record<string,number> = {};
+    if (!selectedRaid) return counts;
+    raids.filter(raid => raid.date < selectedRaid.date).forEach(raid => raid.benches.forEach(name => {
+      counts[name] = (counts[name] ?? 0) + 1;
+    }));
+    return counts;
+  }, [raids, selectedRaidId]);
+  const fairBenchNames = useMemo(() => {
+    const names = new Set<string>();
+    (['dps','healer'] as RolePool[]).forEach(pool => {
+      const peers = roster.filter(player => fairnessPool(player) === pool);
+      if (!peers.length) return;
+      const minimum = Math.min(...peers.map(player => priorBenchCounts[player.name] ?? 0));
+      peers.forEach(player => { if ((priorBenchCounts[player.name] ?? 0) === minimum) names.add(player.name); });
+    });
+    return names;
+  }, [roster, priorBenchCounts]);
 
   const fairness = useMemo(() => {
     const pools:Record<RolePool,RosterPlayer[]> = { dps:[], healer:[], fixed:[] };
@@ -499,6 +519,15 @@ export default function RaidRiskAssessmentProfile() {
     } finally {
       event.target.value = '';
     }
+  }
+
+  function editRosterPlayer(name:string, change:Partial<RosterPlayer>) {
+    setRoster(current => current.map(player => player.name === name ? { ...player, ...change } : player));
+    setRaids(current => current.map(raid => {
+      const specOverrides = { ...raid.specOverrides };
+      delete specOverrides[name];
+      return { ...raid, specOverrides, assignments:undefined };
+    }));
   }
 
   function createRaid() {
@@ -537,15 +566,6 @@ export default function RaidRiskAssessmentProfile() {
     const next = new Set(selectedRaid?.benches ?? []);
     next.has(name) ? next.delete(name) : next.add(name);
     updateRaid({ benches:[...next] });
-  }
-
-  function recordBenchFairness() {
-    if (!selectedRaid) return;
-    setBenchCounts(current => {
-      const next = { ...current };
-      selectedRaid.benches.forEach(name => { next[name] = (next[name] ?? 0) + 1; });
-      return next;
-    });
   }
 
   function applyBenchSuggestion(suggestion:BenchSuggestion) {
@@ -603,6 +623,7 @@ export default function RaidRiskAssessmentProfile() {
           {uploadError && <strong className="uploadError">{uploadError}</strong>}
         </div>
         <label className="uploadButton">Upload roster JSON<input type="file" accept=".json,application/json" onChange={uploadRoster} /></label>
+        {roster.length > 0 && <button onClick={() => setShowRosterEditor(current => !current)}>{showRosterEditor ? 'Close roster editor' : 'Edit roster'}</button>}
         <details>
           <summary>Expected format</summary>
           <pre>{`[
@@ -617,6 +638,18 @@ export default function RaidRiskAssessmentProfile() {
 ]`}</pre>
         </details>
       </section>
+
+      {roster.length > 0 && showRosterEditor && <section className="rosterEditor card">
+        <div className="rosterEditorHeader"><div><p className="eyebrow">Saved locally</p><h3>Edit roster specs</h3></div><small>Current spec is the player’s default. Eligible specs are the options the optimizer may assign for coverage.</small></div>
+        <div className="rosterEditorRows">
+          {roster.map(player => <div className="rosterEditorRow" key={player.name}>
+            <div><strong>{player.name}</strong><small>{player.class} · {player.role}</small></div>
+            <label>Current spec<input value={player.spec} list={`specs-${player.name}`} onChange={event => editRosterPlayer(player.name, { spec:event.target.value })} /></label>
+            <datalist id={`specs-${player.name}`}>{[...new Set([player.spec, ...(player.eligibleSpecs ?? [])])].map(spec => <option value={spec} key={spec} />)}</datalist>
+            <label>Optimizer-eligible specs<input value={(player.eligibleSpecs ?? [player.spec]).join(', ')} onChange={event => editRosterPlayer(player.name, { eligibleSpecs:event.target.value.split(',').map(spec => spec.trim()).filter(Boolean) })} /></label>
+          </div>)}
+        </div>
+      </section>}
 
       {!roster.length && <section className="emptyState card"><h2>No hardcoded roster</h2><p>Upload a roster JSON above. The first 25 players will fill Groups 1–5; additional players enter the bench pool.</p></section>}
 
@@ -688,7 +721,7 @@ export default function RaidRiskAssessmentProfile() {
             <div><p className="eyebrow">Composition-aware fairness</p><h3>Suggested benches</h3><p>{requiredBenchCount ? `Choose ${requiredBenchCount} voluntary bench${requiredBenchCount === 1 ? '' : 'es'} after ${absent.size} absence${absent.size === 1 ? '' : 's'}.` : 'No voluntary benches are required for a 25-player raid.'}</p></div>
             <small>Assignments for Survival and Warlock curses are made after the bench set is chosen.</small>
           </div>
-          {requiredBenchCount > 0 && benchSuggestions.length === 0 && <div className="raidWideRisk missing"><strong>No eligible combination</strong><small>There are not enough bench-eligible players after fixed players and absences are excluded.</small></div>}
+          {requiredBenchCount > 0 && benchSuggestions.length === 0 && <div className="raidWideRisk missing"><strong>No fair bench combination</strong><small>There are not enough available players at the minimum bench count in their fairness pools. A repeat bench is intentionally blocked.</small></div>}
           <div className="benchSuggestionGrid">
             {benchSuggestions.map((suggestion, index) => <article key={suggestion.players.join('|')} className={index === 0 ? 'recommended' : ''}>
               <span>{index === 0 ? 'Recommended' : `Alternative ${index}`}</span>
@@ -704,7 +737,7 @@ export default function RaidRiskAssessmentProfile() {
 
         {selectedRaid && <section className="attendanceGrid">
           <article className="card"><h3>Absences</h3><p>Absences adjust the week but never count as a bench.</p><div className="benchChips">{roster.map(player => <button className={absent.has(player.name) ? 'selectedChip' : ''} key={player.name} onClick={() => toggleAbsence(player.name)}>{player.name}</button>)}</div></article>
-          <article className="card"><h3>Bench</h3><p>Choose from the fairness pools. Spedsilent/Silent and bench-ineligible players are excluded.</p><div className="benchChips">{roster.filter(player => fairnessPool(player) !== 'fixed').map(player => <button disabled={absent.has(player.name)} className={benched.has(player.name) ? 'selectedChip' : ''} key={player.name} onClick={() => toggleBench(player.name)}>{player.name} · sat {benchCounts[player.name] ?? 0}x</button>)}</div><button onClick={recordBenchFairness}>Record this week’s benches</button></article>
+          <article className="card"><h3>Bench</h3><p>Only players at the lowest bench count in their DPS or healer pool are eligible. Counts come automatically from earlier raid dates.</p><div className="benchChips">{roster.filter(player => fairnessPool(player) !== 'fixed').map(player => <button disabled={absent.has(player.name) || (!benched.has(player.name) && !fairBenchNames.has(player.name))} className={benched.has(player.name) ? 'selectedChip' : ''} key={player.name} onClick={() => toggleBench(player.name)}>{player.name} · sat {priorBenchCounts[player.name] ?? 0}x</button>)}</div></article>
         </section>}
       </>}
 
@@ -727,8 +760,8 @@ export default function RaidRiskAssessmentProfile() {
           </div>
         </section>
         <section className="rotationBoard">
-          <article><h3>DPS fairness pool</h3>{fairness.dps.sort((a,b) => (benchCounts[a.name] ?? 0) - (benchCounts[b.name] ?? 0)).map(player => <div className="rotationRow" key={player.name}><strong>{player.name}</strong><span>sat {benchCounts[player.name] ?? 0}x</span></div>)}</article>
-          <article><h3>Healer fairness pool</h3>{fairness.healer.sort((a,b) => (benchCounts[a.name] ?? 0) - (benchCounts[b.name] ?? 0)).map(player => <div className="rotationRow" key={player.name}><strong>{player.name}</strong><span>sat {benchCounts[player.name] ?? 0}x</span></div>)}</article>
+          <article><h3>DPS fairness pool</h3>{fairness.dps.sort((a,b) => (priorBenchCounts[a.name] ?? 0) - (priorBenchCounts[b.name] ?? 0)).map(player => <div className="rotationRow" key={player.name}><strong>{player.name}</strong><span>sat {priorBenchCounts[player.name] ?? 0}x</span></div>)}</article>
+          <article><h3>Healer fairness pool</h3>{fairness.healer.sort((a,b) => (priorBenchCounts[a.name] ?? 0) - (priorBenchCounts[b.name] ?? 0)).map(player => <div className="rotationRow" key={player.name}><strong>{player.name}</strong><span>sat {priorBenchCounts[player.name] ?? 0}x</span></div>)}</article>
         </section>
       </>}
     </section>

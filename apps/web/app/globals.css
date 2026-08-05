@@ -15,6 +15,7 @@ body {
 .uploadButton{cursor:pointer;background:#6957d8;color:white;padding:10px 14px;border-radius:8px;font-weight:700}
 .uploadButton input{display:none}
 .uploadError{display:block;color:#ff9f9f;margin-top:8px}
+.rosterEditor{margin-bottom:18px}.rosterEditorHeader{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:14px}.rosterEditorHeader h3,.rosterEditorHeader p{margin:0}.rosterEditorHeader small{max-width:480px;color:#9ba9bd}.rosterEditorRows{display:grid;gap:7px;max-height:520px;overflow:auto;padding-right:4px}.rosterEditorRow{display:grid;grid-template-columns:minmax(170px,1fr) minmax(180px,1fr) minmax(260px,1.5fr);gap:12px;align-items:end;padding:10px 12px;border:1px solid #283142;border-radius:9px;background:#111722}.rosterEditorRow>div{display:grid;gap:2px}.rosterEditorRow small,.rosterEditorRow label{color:#9ba9bd;font-size:12px}.rosterEditorRow label{display:grid;gap:4px;font-weight:700}.rosterEditorRow input{width:100%}
 .emptyState{text-align:center;padding:50px 24px}
 .attendanceGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
 .benchChips button{margin:4px;padding:7px 9px;border-radius:999px}
@@ -37,6 +38,7 @@ body {
 .benchSuggestionGrid details p{margin:6px 0}
 @media (max-width:900px){.attendanceGrid{grid-template-columns:1fr}}
 @media (max-width:900px){.benchSuggestionGrid{grid-template-columns:1fr}.benchSuggestionHeader{display:block}}
+@media (max-width:900px){.rosterEditorHeader{display:block}.rosterEditorRow{grid-template-columns:1fr}}
 
 button,
 input,
