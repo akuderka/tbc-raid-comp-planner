@@ -7,6 +7,32 @@ body {
   color: #e8eefc;
 }
 
+.rosterUpload{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.rosterUpload>div{flex:1;min-width:240px}
+.rosterUpload h3,.rosterUpload p{margin:0}
+.rosterUpload details{width:100%}
+.rosterUpload pre{overflow:auto;background:#171923;padding:12px;border-radius:8px}
+.uploadButton{cursor:pointer;background:#6957d8;color:white;padding:10px 14px;border-radius:8px;font-weight:700}
+.uploadButton input{display:none}
+.uploadError{display:block;color:#ff9f9f;margin-top:8px}
+.emptyState{text-align:center;padding:50px 24px}
+.attendanceGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.benchChips button{margin:4px;padding:7px 9px;border-radius:999px}
+.selectedChip{background:#7b65e8!important;color:#fff!important}
+.benchSuggestions{margin-top:18px}
+.benchSuggestionHeader{display:flex;justify-content:space-between;gap:20px;align-items:start}
+.benchSuggestionHeader h3,.benchSuggestionHeader p{margin:0}
+.benchSuggestionHeader>small{max-width:360px;color:#9ba9bd}
+.benchSuggestionGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.benchSuggestionGrid article{border:1px solid #303b4e;border-radius:12px;background:#171e2b;padding:14px}
+.benchSuggestionGrid article.recommended{border-color:#7b65e8;box-shadow:0 0 0 1px #7b65e8 inset}
+.benchSuggestionGrid h4{margin:6px 0;font-size:17px}
+.benchSuggestionGrid ul{padding-left:18px;color:#b8c4d7;font-size:13px;min-height:58px}
+.benchSuggestionGrid details{margin:10px 0;color:#b8c4d7;font-size:13px}
+.benchSuggestionGrid details p{margin:6px 0}
+@media (max-width:900px){.attendanceGrid{grid-template-columns:1fr}}
+@media (max-width:900px){.benchSuggestionGrid{grid-template-columns:1fr}.benchSuggestionHeader{display:block}}
+
 button,
 input,
 select {
